@@ -1,0 +1,226 @@
+
+				多线程技术
+	进程：执行中的程序，可执行程序的映射。	《是系统执行的最小单元》
+	线程：本质是函数，可使每个函数同时执行的载体。《是cpu执行的最小单元》
+	线程是CPU执行的最小单元；
+	多线程就是程序允许2个及2个以上的线程同时运行，多线程技术是常用的并发技术（交替执行）。
+	线程要依靠进程活着，而进程可独立存在
+	每个进程有一条默认主线程，通过主线程创造出来的线程都加子线程
+	线程称之为轻量级进程
+	CPU执行机制：以时间片来执行   1s=10e ns   1周期=10ns   1s=1e周期
+	
+	执行多线程时要注意，当多个线程同时操作同一个资源时，为了避免冲突，需要加上锁来限制，如加上互斥锁可以保证同一时刻只有一个线程在操作该资源。同步方式：(互斥锁，事件，信号量，管道，队列)
+	同步：排队执行
+	异步：不排队同时执行
+	
+	
+	
+	线程的创建方式有很多种，从最底层的系统API，到C++的内置操作，以及使用一些第三方库都可以轻松实现。
+	
+	线程创建之后，还要注意线程的连接及分离：join、detach
+	
+	//------------------------------------
+	使用系统API创建，如在windows下创建：CreateThread
+	注意：linux下，一般默认给线程分配栈的大小是8M
+	
+	(
+			LPSECURITY_ATTRIBUTES lpThreadAttributes,//SD：线程安全相关的属性，常置为NULL
+			SIZE_T dwStackSize,//initialstacksize：新线程的初始化栈的大小，可设置为0，
+			LPTHREAD_START_ROUTINE lpStartAddress,//threadfunction：被线程执行的回调函数，也称为线程函数
+			LPVOID lpParameter,//threadargument：传入线程函数的参数，不需传递参数时为NULL
+			DWORD dwCreationFlags,//creationoption：控制线程创建的标志
+			LPDWORD lpThreadId//threadidentifier：传出参数，用于获得线程ID，如果为NULL则不返回线程ID
+    )
+
+	/*
+	lpThreadAttributes：指向SECURITY_ATTRIBUTES结构的指针，决定返回的句柄是否可被子进程继承，如果为NULL则表示返回的句柄不能被子进程继承。
+	
+	dwStackSize：设置初始栈的大小，以字节为单位，如果为0，那么默认将使用与调用该函数的线程相同的栈空间大小。
+	任何情况下，Windows根据需要动态延长堆栈的大小。
+	
+	lpStartAddress：指向线程函数的指针，函数名称没有限制，但是必须以下列形式声明：
+	DWORD WINAPI 函数名 (LPVOID lpParam) ，格式不正确将无法调用成功。
+	
+	lpParameter：向线程函数传递的参数，是一个指向结构的指针，不需传递参数时，为NULL。
+	
+	dwCreationFlags：控制线程创建的标志，可取值如下：
+	（1）CREATE_SUSPENDED(0x00000004)：创建一个挂起的线程（就绪状态），直到线程被唤醒时才调用
+	（2）0：表示创建后立即激活。
+	（3）STACK_SIZE_PARAM_IS_A_RESERVATION(0x00010000)：dwStackSize参数指定初始的保留堆栈的大小，
+	如果STACK_SIZE_PARAM_IS_A_RESERVATION标志未指定，dwStackSize将会设为系统预留的值
+	
+	lpThreadId:保存新线程的id
+	
+	返回值：函数成功，返回线程句柄，否则返回NULL。如果线程创建失败，可通过GetLastError函数获得错误信息。
+	
+	
+	*/
+	
+	BOOL WINAPI CloseHandle(HANDLE hObject);        //关闭一个被打开的对象句柄
+	/*可用这个函数关闭创建的线程句柄，如果函数执行成功则返回true(非0),如果失败则返回false(0)，
+	如果执行失败可调用GetLastError.函数获得错误信息。
+	*/
+	
+	//--------------------代码：
+	
+	#include <windows.h>
+	#include <iostream>
+	using namespace std;
+	
+	DWORD WINAPI MyThread(LPVOID lp)
+	{
+		for (int i=0;i<5;i++)
+		{
+			char s[255] = { 0 };
+			sprintf_s(s, "thread: %d", i);//格式化输出到字符串
+			cout << s << endl;
+			Sleep(100);
+		}
+	
+		return 0;
+	}
+	
+	int main()
+	{
+		HANDLE th = CreateThread(NULL, 0, MyThread, NULL, NULL, NULL);
+		CloseHandle(th);
+		for (int i=0;i<5;i++)
+		{
+			char s[255] = { 0 };
+			sprintf_s(s, "main: %d", i);
+			cout << s << endl;
+			Sleep(100);
+		}
+		return 0;
+	}
+	
+	//输出会比较乱，是因为同一时刻占用资源相互抢了，特别是控制台输出的界面，由CPU时间片进行切换，按周期分配。
+	//为了控制互抢问题，可以加上同步锁，如互斥锁
+	
+	////////////////////////////////////互斥锁：
+	HANDLE WINAPI CreateMutex(
+		LPSECURITY_ATTRIBUTES lpMutexAttributes,        //线程安全相关的属性，常置为NULL
+		BOOL                  bInitialOwner,            //创建Mutex时的当前线程是否拥有Mutex的所有权
+		LPCTSTR               lpName                    //Mutex的名称
+		);
+	/*
+	MutexAttributes:也是表示安全的结构，与CreateThread中的lpThreadAttributes功能相同，表示决定返回的句柄是否可被子进程继承，如果为NULL则表示返回的句柄不能被子进程继承。
+	bInitialOwner:表示创建Mutex时的当前线程是否拥有Mutex的所有权，若为TRUE则指定为当前的创建线程为Mutex对象的所有者，其它线程访问需要先ReleaseMutex
+	lpName:Mutex的名称
+	*/
+	//--------------------------------------//
+	DWORD WINAPI WaitForSingleObject(
+		HANDLE hHandle,                             //要获取的锁的句柄
+		DWORD  dwMilliseconds                           //超时间隔-1无限长
+	);
+/*死锁的四个必要条件
+
+互斥条件（Mutual exclusion）：资源不能被共享，只能由一个进程使用。
+请求与保持条件（Hold and wait）：已经得到资源的进程可以再次申请新的资源。
+非剥夺条件（No pre-emption）：已经分配的资源不能从相应的进程中被强制地剥夺。
+循环等待条件（Circular wait）：系统中若干进程组成环路，该环路中每个进程都在等待相邻进程正占用的资源。*/
+
+/*//处理死锁的策略
+1.忽略该问题。例如鸵鸟算法，该算法可以应用在极少发生死锁的的情况下。为什么叫鸵鸟算法呢，因为传说中鸵鸟看到危险就把头埋在地底下，可能鸵鸟觉得看不到危险也就没危险了吧。跟掩耳盗铃有点像。
+2.检测死锁并且恢复。
+3.仔细地对资源进行动态分配，以避免死锁。
+4.通过破除死锁四个必要条件之一，来防止死锁产生。*/0
+	/*
+	WaitForSingleObject:等待一个指定的对象(如Mutex对象)，直到该对象处于非占用的状态(如Mutex对象被释放)或超出设定的时间间隔。除此之外，还有一个与它类似的函数WaitForMultipleObjects，它的作用是等待一个或所有指定的对象，直到所有的对象处于非占用的状态，或超出设定的时间间隔。 
+	
+	hHandle：要等待的指定对象的句柄。
+	
+	dwMilliseconds：超时的间隔，以毫秒为单位；如果dwMilliseconds为非0，则等待直到dwMilliseconds时间间隔用完或对象变为非占用的状态，如果dwMilliseconds 为INFINITE则表示无限等待，直到等待的对象处于非占用的状态。
+	*/
+	//---------------------------//
+	BOOL WINAPI ReleaseMutex(HANDLE hMutex);
+
+	//说明：释放所拥有的互斥量锁对象，hMutex为释放的互斥量句柄
+	
+	
+	//----------------代码：
+	
+	#include <windows.h>
+	#include <iostream>
+	using namespace std;
+	
+	HANDLE hMutex = NULL;//互斥量
+	
+	DWORD WINAPI MyThread(LPVOID lp)
+	{
+		for (int i=0;i<5;i++)
+		{
+			//请求互斥锁
+			WaitForSingleObject(hMutex, INFINITE);
+			char s[255] = { 0 };
+			sprintf_s(s, "thread: %d", i);
+			cout << s << endl;
+			Sleep(100);
+			//释放互斥锁
+			ReleaseMutex(hMutex);
+		}
+	
+		return 0;
+	}
+	
+	int main()
+	{
+		//创建线程
+		HANDLE th = CreateThread(NULL, 0, MyThread, NULL, NULL, NULL);
+		//关闭线程
+		CloseHandle(th);
+		//创建互斥锁
+		hMutex = CreateMutex(NULL, FALSE, (LPCWSTR)"screen");
+		for (int i=0;i<5;i++)
+		{
+			//请求互斥锁
+			WaitForSingleObject(hMutex, INFINITE);
+			char s[255] = { 0 };
+			sprintf_s(s, "main: %d", i);
+			cout << s << endl;
+			Sleep(100);
+			//释放互斥锁
+			ReleaseMutex(hMutex);
+		}
+		return 0;
+	}
+		
+	///////////////////////////////////////////////////////////：线程(std::thread)
+	//		C++内置的头文件：<thread>
+	
+	#include <iostream>
+	#include <thread>
+	
+	using namespace std;
+	
+	void MyThreadOne()
+	{
+		for (int i=0;i<5;i++)
+		{
+			cout << "MyThreadOne:" << i << endl;
+			
+		}
+	}
+	
+	void MyThreadTwo()
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			cout << "MyThreadTwo:" << i << endl;
+		}
+	}
+	
+	int main()
+	{
+		thread t1(MyThreadOne);
+		thread t2(MyThreadTwo);
+	
+		//t1.join();	//不阻塞，在主线程退出时，子线程会崩溃报异常
+		//t2.join();
+		return 0;
+	}
+	
+	/////////////////////////////////////////：linux 下用 pthread.h ;当然windows也可以配置对应的方式
+	
+	/////////////////////////////////////////：使用 boost 库来创建多线程：
+	

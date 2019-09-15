@@ -1,0 +1,845 @@
+STL : 标准模板库 Standard Template Library
+
+		  C++ STL（标准模板库）是一套功能强大的 C++ 模板类，提供了通用的模板类和函数，这些模板类和函数可以实现多种流行和常用的算法和数据结构，如向量、链表、队列、栈。
+
+	  STL的代码从广义上讲分为三类:
+		  container（容器）
+			  algorithm（算法）
+				  iterator（迭代器）
+
+	  1、容器:
+		  容器是用来管理某一类对象的集合。C++ 提供了各种不同类型的容器，比如 stack、vector、list、deque、map、set等。
+
+	  2、算法:
+		  算法作用于容器。它们提供了执行各种操作的方式，包括对容器内容执行初始化、排序、搜索和转换等操作。
+
+	  3、迭代器:
+		  迭代器用于遍历对象集合的元素。这些集合可能是容器，也可能是容器的子集。
+
+	  
+== == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == == ==
+	  1.1、stack 容器:实现了一个先进后出的数据结构（FILO）,
+	即栈的出口和入口是同一个，只有一个口；
+		头文件: #include<stack>
+
+			初始化:
+				stack<int>
+					s1;
+stack<string> s2;
+
+成员函数:(假设栈对象s)
+1.入栈:如s.push(x);
+
+2.出栈 : 如 s.pop().注意:出栈操作只是删除栈顶的元素，并不返回该元素。
+
+3.访问栈顶:如s.top();
+
+4.判断栈空:如s.empty().当栈空时返回true。
+
+5.访问栈中的元素个数，如s.size（）;
+
+/////////////////////////////////////////////////
+#include <iostream>
+#include <stack>
+using namespace std;
+int main(void)
+{
+	stack<double> s; //初始化一个栈 s
+	for (int i = 0; i < 10; i++)
+		s.push(i); // 入栈，将元素放在顶部
+	while (!s.empty())
+	{
+		printf("%lf\n", s.top());
+		s.pop(); //出栈，删除最上面的元素
+	}
+	cout << "栈内的元素的个数为:" << s.size() << endl;
+	return 0;
+}
+
+//练习:请用数组和模板类，来实现一个栈类，能实现容器栈的同样功能:push、pop、size、empty、top
+
+//--------------------------------------------------------------//
+
+1.2、vector 容器:与数组十分相似，和数组不同的是，vector长度可变，而数组长度固定。
+
+	拥有一段连续的内存空间，能非常好的支持随即存取，即[] 操作符，但由于它的内存空间是连续的，所以在中间进行插入和删除会造成内存块的拷贝，另外，当插入较多的元素后，预留内存空间可能不够，需要重新申请一块足够大的内存并把原来的数据拷贝到新的内存空间。这些影响了vector的效率，
+
+		头文件: #include<vector>
+
+			vector 是一个类模板。不是一种数据类型，vector<int> 是一种数据类型。 Vector的存储空间是连续的, list不是连续存储的。
+
+	//----------------------------
+	定义及初始化:
+vector<typeName> v1;			   //默认v1为空，故以下的赋值是错误的v1[0]=5;
+vector<typeName> v2(v1);   //或v2=v1;或vector<typeName> v2(v1.begin(), v1.end());//v2是v1的一个副本，若v1.size（）>v2.size()则赋值后v2.size()被扩充为v1.size()。
+vector<typeName> v3(n, i); //v3包括n个值为i的typeName类型元素
+vector<typeName> v4(n);	//v4含有n个值为0的元素
+int a[5] = {0, 1, 2, 3, 3};
+vector<int> v5(a, a + 5); //v5的size为5，v5被初始化为a的5个值。后一个指针要指向将被拷贝的末元素的下一位置。
+vector<int> v6(v5);		  //v6是v5的拷贝
+
+vector<类型> 标识符（最大容量，初始全部值）
+
+	//------------------------------
+	向量vector常用成员函数:
+	push_back(t) 在容器的最后加入一个值为t的数据，容器的size变大。 pop_back() 删除容器的末元素，并不返回该元素。
+
+	insert(pointer, number, content) 向v中pointer指向的位置插入number个content的内容。 erase(pointer1, pointer2) 删除pointer1到pointer2中间（包含pointer1所指）的元素。
+
+	clear() 清空当前的vector
+
+	size() 函数显示向量的大小。 capacity() 当前vector分配的大小 // 和 size 有什么区别？
+
+	resize() 改变当前使用数据的大小，如果它比当前使用的大，者填充默认值
+	reserve() 改变当前vecotr所分配空间的大小
+	max_size() 返回vector最大可以是多大
+
+	empty() 推断vector是否为空
+
+	begin() 函数返回一个指向向量开头的迭代器。 end() 函数返回一个指向向量末尾的迭代器。最后元素的后面
+	rbegin() 将vector反转后的开始指针返回(其实就是原来的end - 1)
+	rend() 将vector反转构的结束指针返回(其实就是原来的begin - 1)
+
+	front() 返回向量中第一个元素
+	back() 返回向量中最后一个元素
+	v[n] 返回v中位置为n的元素	 // V 是向量对象    不抛异常取
+	at(i) 得到编号位置i的数据	 // 和 向量对象[i] 的结果一样   可抛异常取
+	swap() 与另一个vector交换数据 //
+
+////////////////////////////////////////////////////////////
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main()
+{
+	// 创建一个向量存储 int
+	vector<int> vec;
+	int i;
+
+	// 显示 vec 的原始大小
+	cout << "vector size = " << vec.size() << endl; //  size() 函数显示向量的大小。
+
+	// 推入 5 个值到向量中
+	for (i = 0; i < 5; i++)
+	{
+		vec.push_back(i); //成员函数在向量的末尾插入值，如果有必要会扩展向量的大小。
+	}
+
+	// 显示 vec 扩展后的大小
+	cout << "extended vector size = " << vec.size() << endl;
+
+	// 访问向量中的 5 个值
+	for (i = 0; i < 5; i++)
+	{
+		cout << "value of vec [" << i << "] = " << vec[i] << endl;
+	}
+
+	// 使用迭代器 iterator 访问值
+	v = vec.begin();	   // begin() 函数返回一个指向向量开头的迭代器。
+	while (v != vec.end()) // end( ) 函数返回一个指向向量末尾的迭代器。
+	{
+		cout << "value of v = " << *v << endl;
+		v++;
+	}
+	return 0;
+}
+
+//--------------size 和 capacity 区别:
+在向量vector的函数中，size() 和capacity() 方法可能会经常混淆。实际上，size返回的是当前vector中有多少个元素，而capacity函数则返回的是它已经分配的内存中可以容纳多少元素，并且pop操作也不会影响到原向量的capacity。不过，如果新申请一个vector，然后用拷贝操作赋值，那么新申请的capacity值就是元素个数。
+//---------------------
+
+#include <iostream>
+#include <stdlib.h>
+#include <vector>
+
+using namespace std;
+
+int main()
+{
+
+	vector<int> vlnt;
+
+	for (int i = 0; i < 20; i++)
+	{
+		vlnt.push_back(i + 1);
+		cout << vlnt.capacity() << " ";		//1 2 3 4 6 6 9 9 9 13 13 13 13 19 19 19 19 28
+	} 
+	cout << endl;							//每次扩容在现容量上除以2，向下取整再加上现容量
+	vector<int> v1(vlnt);
+
+	cout << "v1.size() = " << v1.size() << endl;
+	cout << "vlnt.size() = " << vlnt.size() << endl;
+	cout << "vlnt.capacity() = " << vlnt.capacity() << endl;
+	cout << "v1.capacity() = " << v1.capacity() << endl;
+
+	for (int i = 0; i < 20; i++)
+	{
+		vlnt.pop_back();
+	}
+
+	cout << vlnt.capacity() << endl;
+	system("pause");
+	return 0;
+}
+
+//-----------练习:用vector实现栈的功能，配合模板类，能实现容器栈的同样功能:push、pop、size、empty、top
+
+//------------------------------------------------------//
+1.3、list : stl实现的双向链表，与向量(vectors) 相比, 它允许快速的插入和删除，但是随机访问却比较慢。 链表的内存是不连续的，用指针来访问数据。 list是有序的，可以排序，合并等。
+
+头文件:
+#include <list>
+
+//--------------------
+初始化: list<int> lst1; //创建空list
+
+list<int> lst2(5); //创建含有5个元素的list
+
+list<int> lst3(3, 2); //创建含有3个元素的list，元素为2
+
+list<int> lst4(lst2); //使用lst2初始化lst4
+
+list<int> lst5(lst2.begin(), lst2.end()); //同lst4
+//---------------------
+
+成员函数:
+
+Lst1.assign() 给list赋值
+Lst1.back() 返回最后一个元素
+Lst1.begin() 返回指向第一个元素的迭代器
+Lst1.clear() 删除所有元素
+Lst1.empty() 如果list是空的则返回true
+Lst1.end() 返回末尾的迭代器
+Lst1.erase() 删除一个元素
+Lst1.front() 返回第一个元素
+Lst1.get_allocator() 返回list的配置器
+Lst1.insert() 插入一个元素到list中
+Lst1.max_size() 返回list能容纳的最大元素数量
+Lst1.merge() 合并两个list //需要顺序一致才能合并
+Lst1.pop_back() 删除最后一个元素
+Lst1.pop_front() 删除第一个元素
+Lst1.push_back() 在list的末尾添加一个元素
+Lst1.push_front() 在list的头部添加一个元素
+Lst1.rbegin() 返回指向第一个元素的逆向迭代器
+Lst1.remove() 从list删除元素
+Lst1.remove_if() 按指定条件删除元素
+Lst1.rend() 指向list末尾的逆向迭代器
+Lst1.resize() 改变list的大小
+Lst1.reverse() 把list的元素倒转 //翻转倒置
+Lst1.size() 返回list中的元素个数
+Lst1.sort() 给list排序
+Lst1.splice() 合并两个list
+Lst1.swap() 交换两个list
+Lst1.unique() 删除list中重复的元素
+
+//--------------------- 代码:
+
+#include <iostream>
+#include <list>
+
+using namespace std;
+
+int main()
+{
+	list<int> l1;
+	list<int> l2(2, 0);
+	list<int>::iterator iter;
+	l1.push_back(1);
+	l1.push_back(2);
+	l2.push_back(3);
+	l1.merge(l2);	//默认升序
+	l1.merge(l2, greater<int>()); //合并后降序排列，实际上默认就是升序
+	//greater和less是头文件<functional>
+	//greater降序   less升序
+	for (iter = l1.begin(); iter != l1.end(); iter++)
+	{
+		cout << *iter << " ";
+	}
+	cout << endl
+		 << endl;
+	if (l2.empty())
+	{
+		cout << "l2 变为空 ！！";
+	}
+	cout << endl
+		 << endl;
+	return 0;
+}
+
+//----------------排序及自定义排序
+void sort(); //默认升序排列
+void sort(a,a+n,cmp); //降序排列
+
+template <class Compare>
+
+void sort(Compare comp); //comp可以是一个函数，要求有两个参数，类型跟list中元素类型相同，满足条件时返回true，sort()函数就按照comp中制定的规则对元素进行排序
+
+//---------------
+// list::sort
+#include <iostream>
+#include <list>
+#include <string>
+#include <cctype>
+
+//cctype该库主要是字符处理功能，这个头文件声明了一组函数来分类和变换单个字符。
+//这个库中主要有两种函数:一类负责字符分类功能；一类负责字符转换功能。
+using namespace std;
+
+// comparison, not case sensitive.
+bool compare_nocase(const string &first, const string &second)
+{
+	unsigned int i = 0;
+	while ((i < first.length()) && (i < second.length()))
+	{
+		//将大写字母转为小写字母 tolower,	转大写是toupper
+		if (tolower(first[i]) < tolower(second[i]))
+		{
+			return true;
+		}
+		else if (tolower(first[i]) > tolower(second[i]))
+		{
+			return false;
+		}
+		++i;
+	}
+	return (first.length() < second.length());
+}
+
+int main()
+{
+	list<string> mylist;
+	list<string>::iterator it;
+	mylist.push_back("one");
+	mylist.push_back("two");
+	mylist.push_back("Three");
+
+	mylist.sort();
+
+	cout << "mylist contains:";
+	for (it = mylist.begin(); it != mylist.end(); ++it)
+	{
+		cout << ' ' << *it;
+	}
+	cout << '\n';
+
+	mylist.sort(compare_nocase);
+
+	cout << "mylist contains:";
+	for (it = mylist.begin(); it != mylist.end(); ++it)
+	{
+		cout << ' ' << *it;
+	}
+	cout << '\n';
+
+	return 0;
+}
+
+//输出结果:
+//mylist contains: Three one two
+//mylist contains: one Three two
+
+//------------------------练习:编程题:下题请用list实现
+
+描述:
+写一个程序完成以下命令:
+
+		new id ——新建一个指定编号为id的序列(id<10000) 
+		add id num——向编号为id的序列加入整数num 
+		merge id1 id2——合并序列id1和id2中的数，并将id2清空 
+		unique id——去掉序列id中重复的元素 
+		out id ——从小到大输出编号为id的序列中的元素，以空格隔开
+		
+		输入 
+		第一行一个数n，表示有多少个命令( n＜＝２０００００)。以后n行每行一个命令。
+		
+		输出 
+		按题目要求输出。
+		
+		样例输入:
+		
+		16
+		new 1
+		new 2
+		add 1 1
+		add 1 2
+		add 1 3
+		add 2 1
+		add 2 2
+		add 2 3
+		add 2 4
+		out 1
+		out 2
+		merge 1 2
+		out 1
+		out 2
+		unique 1
+		out 1
+		
+		样例输出:
+		
+		1 2 3 
+		1 2 3 4
+		1 1 2 2 3 3 4
+		
+		1 2 3 4
+--------------------- 
+
+//------------------------------------------------------//
+		1.4、deque:双端队列(double ended queue),长度可变，双端队列不论在尾部或头部插入元素，都十分迅速。而在中间插入元素则会比较费时，因为必须移动中间其他的元素。
+		
+		和vector对比:
+		
+		Vector是单向开口的连续线性空间，deque则是一种双向开口的连续线性空间。deque对象在队列的两端放置元素和删除元素是高效的，而向量vector只是在插入序列的末尾时操作才是高效的。deque和vector的最大差异，一在于deque允许于常数时间内对头端进行元素的插入或移除操作，二在于deque没有所谓的capacity观念，因为它是动态地以分段连续空间组合而成，随时可以增加一段新的空间并链接起来。
+		//--------------------- 
+		deque的特点:
+		
+		1、支持随机访问，即支持[ ]以及at()，但是性能没有vector好。
+		2、可以在内部进行插入和删除操作，但性能不及list。
+		3、deque两端都能够快速插入和删除元素，而vector只能在尾端进行。
+		4、deque的元素存取和迭代器操作会稍微慢一些，因为deque的内部结构会多一个间接过程。
+		5、deque迭代器是特殊的智能指针，而不是一般指针，它需要在不同的区块之间跳转。
+		6、deque可以包含更多的元素，其max_size可能更大，因为不止使用一块内存。
+		7、deque不支持对容量和内存分配时机的控制。
+		8、在除了首尾两端的其他地方插入和删除元素，都将会导致指向deque元素的任何pointers、references、iterators失效。不过，deque的内存重分配优于vector，因为其内部结构显示不需要复制所有元素。
+		9、deque的内存区块不再被使用时，会被释放，deque的内存大小是可缩减的。不过，是不是这么做以及怎么做由实际操作版本定义。
+		10、deque不提供容量操作:capacity()和reverse()，但是vector可以。
+		//--------------------- 
+		头文件:#include<deuqe>
+		
+		
+		初始化:
+		deque<Elem> c 		//创建一个空的deque
+
+		deque<Elem> c1(c2) 	//复制一个deque。
+
+		deque<Elem> c(n) 	//创建一个deque，含有n个数据，数据均已缺省构造产生。
+
+		deque<Elem> c(n, elem) 	//创建一个含有n个elem拷贝的deque。
+
+		deque<Elem> c(beg,end) 	//创建一个以[beg;end)区间的deque。
+		
+		
+		常用成员函数:(假设有双端队列对象:deque <int> c)
+		
+		c.push_back(num)		在末尾位置插入元素
+		
+		c.pop_back()			删除末尾位置的元素
+		
+		c.push_front(num)		在开头位置插入元素
+		
+		c.pop_front()			删除开头位置的元素
+		
+		c.insert(pos,num)		在pos位置插入元素num
+		
+		c.insert(pos,n,num)		在pos位置插入n个元素num
+		
+		c.insert(pos,beg,end)	在pos位置插入区间为[beg,end)的元素
+		
+		c.erase(pos)			删除pos位置的元素c.erase(beg,end)删除区间为[beg,end)的元素
+		
+		c.erase(beg,end)		删除区间为[beg,end)之间的元素
+		
+		c.clear()				清除c容器中拥有的所有元素
+		
+		c.resize(num)			从新定义容器的大小
+		
+		c.begin()				返回指向第一个元素的迭代器
+		
+		c.end()					返回指向最后一个元素下一个位置的迭代器
+		
+		c.rbegin()				返回指向反向队列的第一个元素的迭代器(即原队列的最后一个元素)
+		
+		c.rend()				返回指向反向队列的最后一个元素的下一个位置(即原队列的第一个元素的前一个位置)
+		
+		c.assign(n,num)			将n个num拷贝复制到容器c
+		
+		c.assign(beg,end)		将[beg,end)区间的数据拷贝复制到容器c
+		
+		c.at(pos)				返回索引为pos的位置的元素,会执行边界检查,如果越界抛出out_of_range异常
+		
+		c.empty()				判断c容器是否为空
+		
+		c.front()				返回c容器的第一个元素
+		
+		c.back()				返回c容器的最后一个元素
+		
+		c.size()				返回c容器中实际拥有的元素个数
+		
+		c.max_size()			返回c容器可能存放元素的最大数量
+		
+		c1.swap(c2)				交换容器c1,c2;
+
+		//------------------------------------------代码:
+
+#include <iostream>
+#include <deque>
+		
+using namespace std;
+
+int main()
+{
+	deque<int> d{1, 2, 3, 4, 5};
+	d.push_back(10); //后队列后面插入10
+	deque<int>::iterator it;
+	cout << "push_back(num):";
+	for (it = d.begin(); it != d.end(); it++)
+	{
+		cout << *it << " ";
+	}
+	cout << endl;
+
+	d.pop_back(); // 删除末尾的元素
+	cout << "pop_back(num):";
+	for (it = d.begin(); it != d.end(); it++)
+	{
+		cout << *it << " ";
+	}
+	cout << endl;
+
+	d.push_front(10); //往队列前面插入10
+	cout << "push_front(num):";
+	for (it = d.begin(); it != d.end(); it++)
+	{
+	cout << *it << " ";
+	}
+	cout << endl;
+
+	d.pop_front(); // 删除头部的元素
+	cout << "pop_front(num):";
+	for (it = d.begin(); it != d.end(); it++)
+	{
+		cout << *it << " ";
+	}
+	cout << endl;
+
+	cout << "d.size():" << d.size() << endl;
+	d.resize(d.size() + 5); // 重设大
+	cout << "d.resize() after:" << d.size() << endl;
+
+	////////////////////////////插入相关
+	//deque<int>::iterator it;
+	cout << "insert before:";
+	for (it = d.begin(); it != d.end(); it++)
+	{
+		cout << *it << " ";
+	}
+	cout << endl;
+	d.insert(d.end(), 22);	//末尾插入元素22
+	d.insert(d.end(), 3, 88); //末尾插入3个88
+	int a[5] = {1, 2, 3, 4, 5};
+	d.insert(d.begin(), a, a + 3); // 头部插入1，2，3
+	cout << "insert after:";
+	for (it = d.begin(); it != d.end(); it++)
+	{
+		cout << *it << " ";
+	}
+	cout << endl;
+
+	return 0;
+}
+		
+//////////////练习:
+//请用栈及类模板实现一个双端队列，可以实现队列的front、back、size、empty、
+//push_back、push_front,pop_back,pop_front
+
+
+		//---------------------------------------------//
+		1.5、map容器:
+		提供一对一（其中第一个可以称为关键字，每个关键字只能在map中出现一次，第二个可称为该关键字的值）的数据 处理能力，由于这个特性，它完成有可能在我们处理一对一数据的时候，在编程上提供快速通道。
+		
+		map是一类关联式容器。它的特点是增加和删除节点对迭代器的影响很小，除了那个操作节点，对其他的节点都没有什么影响。对于迭代器来说，可以修改实值，而不能修改key。
+		
+		map内部数据的组织，map内部自建一颗红黑树(一 种非严格意义上的平衡二叉树)，这颗树具有对数据自动排序的功能，所以在map内部所有的数据都是有序的
+		
+		红黑树:是一种自平衡二叉查找树，是在计算机科学中用到的一种数据结构，典型的用途是实现关联数组。
+		
+		红黑树的特点:
+			1、红黑树的根节点为黑色
+			2、红黑树中扩充的外部节点都是黑色节点
+			3、红色节点的两个子节点都是黑色节点，不允许两个连续的红色节点
+			4、任何节点到其子孙的外部节点的每条简单路径都包含相同数目的黑色节点
+		
+		头文件:#include <map> 
+		
+		
+		初始化:
+			// 1. 直接定义
+			map<char,int> mymap;
+		
+			// 2. 复制
+			map<char, int> second(mymap);
+			
+			// 3. 通过迭代器
+			map<char, int> third(mymap.begin(),mymap.end());
+			
+			// 4. 重新定义 Compare 对象，该对象内部对运算符 () 进行重载
+			map<char, int, classcomp> fourth;
+			
+			// 5. 通过函数指针
+			bool(*fn_pt)(char, char) = fncomp;
+			map<char, int, bool(*)(char, char)> fifth(fn_pt);
+			
+		成员函数:(按首字母排序)
+		
+			begin()          返回指向map头部的迭代器
+			clear(）         删除所有元素
+			count()          返回指定元素出现的次数(key)//可以判断key是否存在
+			empty()          如果map为空则返回true
+			end()            返回指向map末尾的迭代器
+			equal_range()    返回特殊条目的迭代器对//比较
+			erase()          删除一个元素
+			find()           查找一个元素//key，返回键所在的迭代器，找不到返回end（）
+			get_allocator()  返回map的配置器
+			insert()         插入元素
+			key_comp()       返回比较元素key的函数（用来比较key）/
+			lower_bound()    返回键值>=给定元素的第一个位置
+			max_size()       返回可以容纳的最大元素个数
+			rbegin()         返回一个指向map尾部的逆向迭代器
+			rend()           返回一个指向map头部的逆向迭代器
+			size()           返回map中元素的个数
+			swap()           交换两个map
+			upper_bound()    返回键值>给定元素的第一个位置
+			value_comp()     返回比较元素value的函数
+
+		//--------------------------------
+		#include <iostream>
+		#include <map>
+				
+		using namespace std;
+
+		// 比较函数（用于后面的函数指针定义）
+		bool fncomp(char lhs, char rhs)
+		{
+			return lhs < rhs;
+		}
+
+		// 定义一个 Compare 对象，且内部对运算符 () 进行重载
+		struct classcomp
+		{
+			bool operator() (const char& lhs, const char& rhs)
+			{
+				return lhs < rhs;
+			}
+		};
+
+		int main(int argc, char *argv[])
+		{
+			//=========================
+			//  map 的多种构造函数
+			//=========================
+
+			// 1. 直接定义
+			map<char, int> mymap;
+
+			// 2. 复制
+			map<char, int> second(mymap);
+
+			// 3. 通过迭代器
+			map<char, int> third(mymap.begin(), mymap.end());
+
+			// 4. 重新定义 Compare 对象，该对象内部对运算符 () 进行重载
+			map<char, int, classcomp> fourth;
+
+			// 5. 通过函数指针
+			bool (*fn_pt)(char, char) = fncomp;
+			map<char, int, bool (*)(char, char)> fifth(fn_pt);
+
+			//=========================
+			//  以最初定义的mymap 为例，讲解 map 的使用
+			//=========================
+			map<char, int>::key_compare key_comp;
+			map<char, int>::iterator it;
+			it = mymap.begin();
+
+			//=========================
+			//  1. 输出所有 Pair 元素
+			//=========================
+			// 迭代器遍历 map
+			for (it; it != mymap.end(); it++)
+			{
+				// map的迭代器，可以用 first 访问std::pair的第一个成员(Type1)，second 访问第二个成员 (Type2)
+				cout << it->first << ":" << it->second << endl;
+			}
+			cout << "=================================" << endl;
+
+			//=========================
+			//  2. 修改映射值
+			//=========================
+			second.clear();
+			second['a'] = 1002;
+			second['b'] = 10023;
+			while (!second.empty())
+			{
+				cout << second.begin()->first << " => ";
+				cout << second.begin()->second << endl;
+				second.erase(second.begin());
+			}
+			cout << "=================================" << endl;
+
+			//=========================
+			//  3. 插入
+			//=========================
+			mymap.insert(pair<char, int>('f', 100));
+			mymap.insert(pair<char, int>('g', 200));
+			cout << "f => " << mymap.find('f')->second << endl;
+			cout << "g => " << mymap.find('g')->second << endl;
+
+			cout << "=================================" << endl;
+
+			//=========================
+			//  4. Compare 参数的使用
+			//=========================
+			key_comp = mymap.key_comp();
+			cout << "mymap contains:\n";
+
+			// 迭代器反向遍历的起始位置
+			char highest = mymap.rbegin()->first; // key value of last element
+			it = mymap.begin();
+			do
+			{
+				cout << (*it).first << " => " << (*it).second << endl;
+			} while (key_comp((*it++).first, highest));
+
+			cout << endl;
+			return 0;
+		}
+		//------------------------------练习题:
+		//设计一个学生类，私有属性:班级、姓名、体重；
+		//公有方法:带参初始化所有属性（班级、姓名、体重）的构造函数
+		//			show函数，可以输出该学生的信息:班级、姓名、体重
+		//			get_stu_by_class函数，通过传入班级，返回该班级所有学生
+		//			get_weight_ave_all函数,可以输出每个班级的平均体重
+		//要求:添加一个容器来保存学生信息；
+		//		主函数要实例化出来5个学生，1班3个，2班2个，信息自拟
+		//		调用最后实例化的那个学生的功能函数:show、
+		//										  get_stu_by_class、
+		//										  get_weight_ave_all
+
+		//---------------------------------------//
+		1.6、set : 集合（有且只有键）
+					   set是关联式容器。 //有键  :唯一性，用红黑树排序（二分法查找）
+				   set作为一个容器也是用来存储同一数据类型的数据类型，并且能从一个数据集合中取出数据，
+					   在set中每个元素的值都唯一，
+						   而且系统能根据元素的值自动进行排序。 应该注意的是set中元素的值不能直接被改变。
+
+				   头文件: #include<set>
+					   //--------------------
+					   初始化:（跟map类似，这里只列举2种）
+
+						   set<int>
+							   s; //初始化一个空集合
+
+		int myints[] = {75, 23, 65, 42, 13};
+		set<int> myset(myints, myints + 5); //初始化一个有5个元素的集合
+
+		//--------------------
+		成员函数:
+
+		1. begin()-- 返回指向第一个元素的迭代器
+
+			2. clear()-- 清除所有元素
+
+			3. count()-- 返回某个值元素的个数 //一或者零
+
+			4. empty()-- 如果集合为空，返回true
+
+			5. end()-- 返回指向末尾的迭代器
+
+			6. equal_range()-- 返回集合中与给定值相等的上下限的两个迭代器
+
+			7. erase()-- 删除集合中的元素,
+			注意:set中的删除操作是不进行任何的错误检查的
+
+			8. find()-- 返回一个指向被查找到元素的迭代器,
+			如果没找到则返回end()。
+
+			9. get_allocator()-- 返回集合的分配器
+
+			10. insert()-- 在集合中插入元素
+
+			11. lower_bound()-- 返回指向大于（或等于）某值的第一个元素的迭代器
+
+			12. key_comp()-- 返回一个用于元素间值比较的函数
+
+			13. max_size()-- 返回集合能容纳的元素的最大限值
+
+			14. rbegin()-- 返回指向集合中最后一个元素的反向迭代器
+
+			15. rend()-- 返回指向集合中第一个元素的反向迭代器
+
+			16. size()-- 集合中元素的数目
+
+			17. swap()-- 交换两个集合变量
+
+			18. upper_bound()-- 返回大于某个值元素的迭代器
+
+		//------------------------代码:
+
+#include <set>
+#include <iostream>
+			using namespace std;
+		int main()
+		{
+
+			int arr[5] = {0, 1, 2, 3, 4};
+			set<int> iset(arr, arr + 5);
+
+			iset.insert(5);
+			cout << "size:" << iset.size() << endl;
+			cout << "3 count = " << iset.count(3) << endl;
+			iset.erase(1);
+
+			set<int>::iterator ite1 = iset.begin();
+			set<int>::iterator ite2 = iset.end();
+			for (; ite1 != ite2; ite1++)
+			{
+				cout << *ite1;
+			}
+			cout << endl;
+
+			ite1 = iset.find(3);
+			if (ite1 != iset.end())
+				cout << "3 found" << endl;
+
+			ite1 = iset.find(1);
+			if (ite1 == iset.end())
+				cout << "1 not found" << endl;
+
+			pair<set<int>::const_iterator, set<int>::const_iterator> pr;
+			pr = iset.equal_range(2);
+			cout << "大于等于2的第一个:" << *pr.first << endl
+				 << "大于2的第一个:" << *pr.second << endl;
+			return 0;
+		}
+
+		//-------------练习题:
+		//有一个任意个数的向量，想办法去掉里面重复的元素。请使用set的方式。
+
+		//------------------------------小结:map和set
+
+		（1）为何map和set的插入删除效率比用其他序列容器高？
+
+				大部分人说，很简单，因为对于关联容器来说，不需要做内存拷贝和内存移动。说对了，确实如此。set容器内所有元素都是以节点的方式来存储，其节点结构和链表差不多，指向父节点和子节点。结构图可能如下:
+		
+		
+		
+		　　 A
+		　 / 
+		\
+		　 B C
+		
+		　/ \ /
+			D E F G
+
+				因此插入的时候只需要稍做变换，把节点的指针指向新的节点就可以了。删除的时候类似，稍做变换后把指向删除节点的指针指向其他节点也OK了。这里的一切操作就是指针换来换去，和内存移动没有关系。
+
+			（2）为何每次insert之后，以前保存的iterator不会失效？
+
+				iterator这里就相当于指向节点的指针，内存没有变，指向内存的指针怎么会失效呢(当然被删除的那个元素本身已经失效了)。相对于vector来说，每一次删除和插入，指针都有可能失效，调用push_back在尾部插入也是如此。因为为了保证内部数据的连续存放，iterator指向的那块内存在删除和插入过程中可能已经被其他内存覆盖或者内存已经被释放了。即使时push_back的时候，容器内部空间可能不够，需要一块新的更大的内存，只有把以前的内存释放，申请新的更大的内存，复制已有的数据元素到新的内存，最后把需要插入的元素放到最后，那么以前的内存指针自然就不可用了。特别时在和find等算法在一起使用的时候，牢记这个原则:不要使用过期的iterator。
+
+			（3）当数据元素增多时，set的插入和搜索速度变化如何？
+
+			如果你知道log2的关系你应该就彻底了解这个答案。在set中查找是使用二分查找，也就是说，如果有16个元素，最多需要比较4次就能找到结果，有32个元素，最多比较5次。那么有10000个呢？最多比较的次数为log10000，最多为14次，如果是20000个元素呢？最多不过15次。看见了吧，当数据量增大一倍的时候，搜索次数只不过多了1次，多了
+			1 /
+			14的搜索时间而已。你明白这个道理后，就可以安心往里面放入元素了。
